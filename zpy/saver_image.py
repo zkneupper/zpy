@@ -201,11 +201,13 @@ class ImageSaver(zpy.saver.Saver):
             # Annotation images take a while
             if i >= num_annotated_images:
                 return
-            annotations = []
-            for annotation in self.annotations:
-                if annotation["image_id"] == image["id"]:
-                    annotations.append(annotation)
-            if len(annotations) > 0:
+            annotations = [
+                annotation
+                for annotation in self.annotations
+                if annotation["image_id"] == image["id"]
+            ]
+
+            if annotations:
                 zpy.viz.draw_annotations(
                     image_path=Path(image["output_path"]),
                     annotations=annotations,
@@ -264,4 +266,3 @@ class ImageSaver(zpy.saver.Saver):
             )
         except Exception as e:
             log.warning(f"Error when visualizing {e}")
-            pass

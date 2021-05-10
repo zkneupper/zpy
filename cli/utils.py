@@ -95,19 +95,17 @@ def download_url(url, output_path):
     h = u.info()
     totalSize = int(h["Content-Length"])
 
-    fp = open(output_path, "wb")
+    with open(output_path, "wb") as fp:
+        with tqdm(total=totalSize) as pbar:
+            blockSize = 8192
+            while True:
+                chunk = u.read(blockSize)
+                if not chunk:
+                    break
+                fp.write(chunk)
+                pbar.update(blockSize)
 
-    blockSize = 8192
-    with tqdm(total=totalSize) as pbar:
-        while True:
-            chunk = u.read(blockSize)
-            if not chunk:
-                break
-            fp.write(chunk)
-            pbar.update(blockSize)
-
-    fp.flush()
-    fp.close()
+        fp.flush()
 
 
 def fetch_auth(func):

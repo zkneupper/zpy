@@ -23,9 +23,7 @@ def get_requirements_from_file(python_requirements_file="./requirements.txt"):
         while requirement:
             if requirement.strip().startswith("#"):
                 pass
-            elif requirement.strip() == "":
-                pass
-            else:
+            elif requirement.strip() != "":
                 requirements.append(requirement.strip())
             requirement = requirements_file.readline()
 

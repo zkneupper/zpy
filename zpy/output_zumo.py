@@ -117,7 +117,7 @@ def parse_zumo_annotations(
         # HACK: JSON will convert int keys to str, so undo that here
         image_id = int(image_id)
         # Image ID
-        if not image_id == img["id"]:
+        if image_id != img["id"]:
             raise ZUMOParseError(
                 f"image id {image_id} does not match image dict key {img['id']}"
             )
@@ -130,11 +130,8 @@ def parse_zumo_annotations(
             raise ZUMOParseError(f"invalid image id {image_id}")
         # Frame
         frame = img.get("frame", None)
-        if frame is not None:
-            if not isinstance(frame, int):
-                raise ZUMOParseError(f"frame {frame} must be int.")
-            if image_id < 0:
-                raise ZUMOParseError(f"invalid image frame {frame}")
+        if frame is not None and not isinstance(frame, int):
+            raise ZUMOParseError(f"frame {frame} must be int.")
         # Height and Width
         height, width = img["height"], img["width"]
         if not isinstance(height, int):
@@ -150,8 +147,8 @@ def parse_zumo_annotations(
                 raise ZUMOParseError(f"name {name} must be str.")
             if (
                 frame is not None
-                and (not zpy.files.id_from_image_name(name) == frame)
-                and (not zpy.files.id_from_image_name(name) == image_id)
+                and zpy.files.id_from_image_name(name) != frame
+                and zpy.files.id_from_image_name(name) != image_id
             ):
                 raise ZUMOParseError(
                     f"name {name} does not correspond to"
@@ -183,7 +180,7 @@ def parse_zumo_annotations(
         # HACK: JSON will convert int keys to str, so undo that here
         category_id = int(category_id)
         # Category ID
-        if not category_id == category["id"]:
+        if category_id != category["id"]:
             raise ZUMOParseError(
                 f"category_id {category_id} does not match category dict key {category['id']}"
             )
@@ -234,28 +231,17 @@ def parse_zumo_annotations(
 
         # Bounding Boxes
         bbox = annotation.get("bbox", None)
-        if bbox is not None:
-            pass
-
         # Keypoints
         keypoints = annotation.get("num_keypoints", None)
         if keypoints is not None:
-            if "keypoints_xyv" in annotation:
-                if (
-                    len(annotation["keypoints_xyv"])
-                    != int(annotation["num_keypoints"]) * 3
-                ):
-                    raise ZUMOParseError(
-                        "keypoints_xyv not correct size {len(keypoints)}"
-                    )
-            if "keypoints_xyz" in annotation:
-                if (
-                    len(annotation["keypoints_xyz"])
-                    != int(annotation["num_keypoints"]) * 3
-                ):
-                    raise ZUMOParseError(
-                        "keypoints_xyz not correct size {len(keypoints)}"
-                    )
+            if "keypoints_xyv" in annotation and (
+                len(annotation["keypoints_xyv"]) != int(annotation["num_keypoints"]) * 3
+            ):
+                raise ZUMOParseError("keypoints_xyv not correct size {len(keypoints)}")
+            if "keypoints_xyz" in annotation and (
+                len(annotation["keypoints_xyz"]) != int(annotation["num_keypoints"]) * 3
+            ):
+                raise ZUMOParseError("keypoints_xyz not correct size {len(keypoints)}")
 
         # Save each annotation to ImageSaver object
         if output_saver:

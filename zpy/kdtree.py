@@ -21,9 +21,11 @@ def kdtree_from_collection(
 ) -> mathutils.kdtree.KDTree:
     """Creates a KDTree of vertices from a collection of objects."""
     # First get the size of the objects (number of vertices)
-    size = 0
-    for obj in zpy.objects.for_obj_in_collections(collections):
-        size += len(obj.data.vertices)
+    size = sum(
+        len(obj.data.vertices)
+        for obj in zpy.objects.for_obj_in_collections(collections)
+    )
+
     # Then add them to a tree object
     kd = mathutils.kdtree.KDTree(size)
     insert_idx = 0
@@ -62,11 +64,13 @@ def floor_occupancy(
             x = float(x)
             y = float(y)
             closest_point = kdtree.find((x, y, z_height))[0]
-            if (closest_point.x > (x - x_step)) and (closest_point.x < (x + x_step)):
-                if (closest_point.y > (y - y_step)) and (
-                    closest_point.y < (y + y_step)
-                ):
-                    occupancy_grid[x_idx][y_idx] = 1.0
+            if (
+                (closest_point.x > (x - x_step))
+                and (closest_point.x < (x + x_step))
+                and (closest_point.y > (y - y_step))
+                and (closest_point.y < (y + y_step))
+            ):
+                occupancy_grid[x_idx][y_idx] = 1.0
     log.info(f"... Done.")
     log.debug(f"Floor occupancy grid: {str(occupancy_grid)}")
     return float(np.mean(occupancy_grid.copy()))
@@ -104,16 +108,15 @@ def volume_occupancy(
                 y = float(y)
                 z = float(z)
                 closest_point = kdtree.find((x, y, z))[0]
-                if (closest_point.x > (x - x_step)) and (
-                    closest_point.x < (x + x_step)
+                if (
+                    (closest_point.x > (x - x_step))
+                    and (closest_point.x < (x + x_step))
+                    and (closest_point.y > (y - y_step))
+                    and (closest_point.y < (y + y_step))
+                    and (closest_point.z > (z - z_step))
+                    and (closest_point.z < (z + z_step))
                 ):
-                    if (closest_point.y > (y - y_step)) and (
-                        closest_point.y < (y + y_step)
-                    ):
-                        if (closest_point.z > (z - z_step)) and (
-                            closest_point.z < (z + z_step)
-                        ):
-                            occupancy_grid[x_idx][y_idx][z_idx] = 1.0
+                    occupancy_grid[x_idx][y_idx][z_idx] = 1.0
     log.info(f"... Done.")
     log.debug(f"Volume occupancy grid: {str(occupancy_grid)}")
     return float(np.mean(occupancy_grid.copy()))

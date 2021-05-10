@@ -159,11 +159,7 @@ def is_child_hit(
     hit_obj = zpy.objects.verify(hit_obj)
     if obj == hit_obj:
         return True
-    else:
-        for child in obj.children:
-            if is_child_hit(child, hit_obj):
-                return True
-        return False
+    return any(is_child_hit(child, hit_obj) for child in obj.children)
 
 
 def is_visible(
@@ -231,9 +227,7 @@ def is_in_view(
         return False
     if x < (0 - epsilon) or x > (1 + epsilon):
         return False
-    if y < (0 - epsilon) or y > (1 + epsilon):
-        return False
-    return True
+    return y >= 0 - epsilon and y <= 1 + epsilon
 
 
 @gin.configurable

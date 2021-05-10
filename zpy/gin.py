@@ -82,7 +82,7 @@ def parse_gin_config(
         log.info(f"No gin file to parse.")
     else:
         if not gin_config.endswith(".gin"):
-            gin_config = gin_config + ".gin"
+            gin_config += ".gin"
         gin_config_filename = Path(gin_config)
         gin_config_dir = zpy.files.verify_path(gin_config_dir, check_dir=True)
         gin_config_path = gin_config_dir / gin_config_filename

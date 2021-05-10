@@ -23,7 +23,7 @@ def make_aov_pass(
     """Make AOV pass in Cycles."""
     scene = zpy.blender.verify_blender_scene()
     # Make sure engine is set to Cycles
-    if not (scene.render.engine == "CYCLES"):
+    if scene.render.engine != "CYCLES":
         log.warning(" Setting render engine to CYCLES to use AOV")
         scene.render.engine = "CYCLES"
         scene.render.use_compositing = True
@@ -272,7 +272,7 @@ def default_render_settings(
     """
     scene = zpy.blender.verify_blender_scene()
     # Make sure engine is set to Cycles
-    if not (scene.render.engine == "CYCLES"):
+    if scene.render.engine != "CYCLES":
         log.warning(" Setting render engine to CYCLES")
         scene.render.engine == "CYCLES"
 
@@ -334,7 +334,7 @@ def segmentation_render_settings():
     scene = zpy.blender.verify_blender_scene()
 
     # Make sure engine is set to Cycles
-    if not (scene.render.engine == "CYCLES"):
+    if scene.render.engine != "CYCLES":
         log.warning(" Setting render engine to CYCLES")
         scene.render.engine == "CYCLES"
 
