@@ -134,7 +134,7 @@ class OutputCOCO(zpy.output.Output):
         _coco_img_id_to_idx = {}  # Image id does not correspond to index in image list
         coco_images = []
         for image in self.saver.images.values():
-            if only_default_images and not image["style"] == "default":
+            if only_default_images and image["style"] != "default":
                 # COCO annotations only have image annotations
                 # for RGB images. No segmentation images.
                 continue
@@ -169,7 +169,7 @@ class OutputCOCO(zpy.output.Output):
         for annotation in self.saver.annotations:
             if (
                 only_default_images
-                and not self.saver.images[annotation["image_id"]]["style"] == "default"
+                and self.saver.images[annotation["image_id"]]["style"] != "default"
             ):
                 # COCO annotations only have image annotations
                 # for RGB images. No segmentation images.
@@ -281,7 +281,7 @@ class OutputCOCO(zpy.output.Output):
         for annotation in self.saver.annotations:
             if (
                 only_default_images
-                and not self.saver.images[annotation["image_id"]]["style"] == "default"
+                and self.saver.images[annotation["image_id"]]["style"] != "default"
             ):
                 # COCO annotations only have image annotations
                 # for RGB images. No segmentation images.
@@ -552,28 +552,23 @@ def parse_coco_annotations(
 
         # Bounding Boxes
         bbox = annotation.get("bbox", None)
-        if bbox is not None:
-            pass
-
         # Keypoints
         keypoints = annotation.get("num_keypoints", None)
         if keypoints is not None:
-            if "keypoints_xyv" in annotation:
-                if (
-                    len(annotation["keypoints_xyv"])
-                    != int(annotation["num_keypoints"]) * 3
-                ):
-                    raise COCOParseError(
-                        "keypoints_xyv not correct size {len(keypoints)}"
-                    )
-            if "keypoints_xyz" in annotation:
-                if (
-                    len(annotation["keypoints_xyz"])
-                    != int(annotation["num_keypoints"]) * 3
-                ):
-                    raise COCOParseError(
-                        "keypoints_xyz not correct size {len(keypoints)}"
-                    )
+            if "keypoints_xyv" in annotation and (
+                len(annotation["keypoints_xyv"])
+                != int(annotation["num_keypoints"]) * 3
+            ):
+                raise COCOParseError(
+                    "keypoints_xyv not correct size {len(keypoints)}"
+                )
+            if "keypoints_xyz" in annotation and (
+                len(annotation["keypoints_xyz"])
+                != int(annotation["num_keypoints"]) * 3
+            ):
+                raise COCOParseError(
+                    "keypoints_xyz not correct size {len(keypoints)}"
+                )
 
         # Save each annotation to ImageSaver object
         if output_saver:

@@ -84,10 +84,12 @@ def random_hdri(
         hdri_dir = zpy.blender.get_asset_lib_path().joinpath(hdri_dir)
     hdri_dir = zpy.files.verify_path(hdri_dir, check_dir=True)
     # Create list of HDRIs in directory
-    hdri_paths = []
-    for _path in hdri_dir.iterdir():
-        if _path.is_file() and _path.suffix in [".hdri", ".hdr"]:
-            hdri_paths.append(_path)
+    hdri_paths = [
+        _path
+        for _path in hdri_dir.iterdir()
+        if _path.is_file() and _path.suffix in [".hdri", ".hdr"]
+    ]
+
     hdri_path = random.choice(hdri_paths)
     log.info(f"Found {len(hdri_paths)} HDRIs at {hdri_dir}")
     log.info(f"Randomly picked {hdri_path.stem}")

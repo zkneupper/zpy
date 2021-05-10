@@ -160,7 +160,7 @@ class VisualizeInstance(Operator):
         context.space_data.shading.color_type = "OBJECT"
         # Loop through all objects in the scene
         for obj in context.scene.objects:
-            if not obj.type == "MESH":
+            if obj.type != "MESH":
                 continue
             context.view_layer.objects.active = obj
             if obj.seg.instance_color is not None:
@@ -181,7 +181,7 @@ class VisualizeCategory(Operator):
         context.space_data.shading.color_type = "OBJECT"
         # Loop through all objects in the scene
         for obj in context.scene.objects:
-            if not obj.type == "MESH":
+            if obj.type != "MESH":
                 continue
             context.view_layer.objects.active = obj
             if obj.seg.category_color is not None:
@@ -206,7 +206,7 @@ class ResetSegData(Operator):
         context.space_data.shading.color_type = "OBJECT"
         for obj in context.selected_objects:
             # Only meshes or empty objects TODO: Why the empty objects
-            if not (obj.type == "MESH" or obj.type == "EMPTY"):
+            if not obj.type in ["MESH", "EMPTY"]:
                 continue
             obj.seg.instance_name = ""
             obj.seg.instance_color = zpy.color.default_color(output_style="frgb")
@@ -253,12 +253,9 @@ class CategoriesFromText(Operator):
         # BUG: Clicking "Text" resets all the categories and their colors
 
         txt = bpy.data.texts
-        if "categories" in txt.keys():
-            category_text = txt["categories"]
-
-        else:
+        if "categories" not in txt.keys():
             txt.new("categories")
-            category_text = txt["categories"]
+        category_text = txt["categories"]
 
         assert (
             category_text is not None

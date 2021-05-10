@@ -95,9 +95,7 @@ def file_is_of_type(
     assert (
         FILE_REGEX.get(filetype, None) is not None
     ), f"{filetype} must be in {FILE_REGEX.keys()}"
-    if re.search(FILE_REGEX[filetype], path):
-        return True
-    return False
+    return bool(re.search(FILE_REGEX[filetype], path))
 
 
 def make_rgb_image_name(id: int, extension: str = ".png") -> str:
@@ -175,7 +173,7 @@ def id_from_image_name(image_name: str) -> int:
     Returns:
         int: Integer id.
     """
-    return int("".join([s for s in image_name if s.isdigit()]))
+    return int("".join(s for s in image_name if s.isdigit()))
 
 
 def replace_id_in_image_name(image_name: str, new_id: int) -> str:
@@ -313,7 +311,7 @@ def write_json(
         ValueError: Path is not a json file.
     """
     path = to_pathlib_path(path)
-    if not path.suffix == ".json":
+    if path.suffix != ".json":
         raise ValueError(f"{path} is not a JSON file.")
     log.info(f"Writing JSON to file {path}")
     with path.open("w") as f:
@@ -335,7 +333,7 @@ def read_json(
         Union[Dict, List]: Data in the json.
     """
     path = to_pathlib_path(path)
-    if not path.suffix == ".json":
+    if path.suffix != ".json":
         raise ValueError(f"{path} is not a JSON file.")
     log.info(f"Reading JSON file at {path}")
     with path.open() as f:
@@ -359,7 +357,7 @@ def write_csv(
         ValueError: Path is not a csv or txt file.
     """
     path = to_pathlib_path(path)
-    if not path.suffix in [".csv", ".txt"]:
+    if path.suffix not in [".csv", ".txt"]:
         raise ValueError(f"{path} is not a CSV file.")
     log.info(f"Writing CSV to file {path}")
     with path.open("w") as f:
@@ -383,7 +381,7 @@ def read_csv(path: Union[Path, str], delimiter: str = ",", **kwargs) -> List[Lis
         List[List[Any]]: Data in the csv.
     """
     path = to_pathlib_path(path)
-    if not path.suffix in [".csv", ".txt"]:
+    if path.suffix not in [".csv", ".txt"]:
         raise ValueError(f"{path} is not a CSV file.")
     log.info(f"Reading CSV file at {path}")
     data = []
@@ -410,10 +408,9 @@ def sample(
     if sample_size is not None:
         random_sample_size = min(sample_size, len(things))
     if random_sample_size == len(things):
-        sample_images = things
+        return things
     else:
-        sample_images = random.sample(things, random_sample_size)
-    return sample_images
+        return random.sample(things, random_sample_size)
 
 
 def filecopy(
@@ -484,11 +481,14 @@ def unzip_file(
     log.info(f"Unzipping {zip_path} to {out_path}...")
     zip_path = verify_path(zip_path)
     out_path = verify_path(out_path, check_dir=True)
-    if not zip_path.suffix == ".zip":
+    if zip_path.suffix != ".zip":
         raise ValueError(f"{zip_path} is not a zip file")
     zf = zipfile.ZipFile(str(zip_path))
-    zipped_size_mb = round(sum([i.compress_size for i in zf.infolist()]) / 1024 / 1024)
-    unzipped_size_mb = round(sum([i.file_size for i in zf.infolist()]) / 1024 / 1024)
+    zipped_size_mb = round(
+        sum(i.compress_size for i in zf.infolist()) / 1024 / 1024
+    )
+
+    unzipped_size_mb = round(sum(i.file_size for i in zf.infolist()) / 1024 / 1024)
     log.info(f"Compressed: {zipped_size_mb}MB, actual: {unzipped_size_mb}MB.")
     zf.extractall(out_path)
     log.info(f"Done extracting to {out_path}.")
@@ -510,13 +510,16 @@ def zip_file(
     log.info(f"Zipping {in_path} to {zip_path}...")
     in_path = verify_path(in_path)
     zip_path = verify_path(zip_path)
-    if not zip_path.suffix == ".zip":
+    if zip_path.suffix != ".zip":
         raise ValueError(f"{zip_path} is not a zip file")
     shutil.make_archive(
         base_name=zip_path.parent / zip_path.stem, format="zip", root_dir=in_path
     )
     log.info(f"Done zipping to {zip_path}.")
     zf = zipfile.ZipFile(str(zip_path))
-    zipped_size_mb = round(sum([i.compress_size for i in zf.infolist()]) / 1024 / 1024)
-    unzipped_size_mb = round(sum([i.file_size for i in zf.infolist()]) / 1024 / 1024)
+    zipped_size_mb = round(
+        sum(i.compress_size for i in zf.infolist()) / 1024 / 1024
+    )
+
+    unzipped_size_mb = round(sum(i.file_size for i in zf.infolist()) / 1024 / 1024)
     log.info(f"Compressed: {zipped_size_mb}MB, actual: {unzipped_size_mb}MB.")

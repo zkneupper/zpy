@@ -176,7 +176,7 @@ def category_barplot(
                 subplot_num_rows, subplot_num_cols, subplot_plot_idx + i + 1
             )
             subcategory_count = category["subcategory_count"]
-            ax.barh(subcategories, category["subcategory_count"])
+            ax.barh(subcategories, subcategory_count)
             ax.set(title=f'Annotations per Subcategory of {category["name"]}')
             ax.set(xlabel="Number of Annotations")
             ax.set(ylabel=f'Subcategory of {category["name"]}')

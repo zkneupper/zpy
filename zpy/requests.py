@@ -43,9 +43,8 @@ def verify_key(request: Dict, key: str, key_type: type = None) -> Any:
     value = request.get(key, None)
     if value is None:
         raise InvalidRequest(f"Required key {key} not found.")
-    if key_type is not None:
-        if not isinstance(value, key_type):
-            raise InvalidRequest(f"Key {key} must be of type {key_type}.")
+    if key_type is not None and not isinstance(value, key_type):
+        raise InvalidRequest(f"Key {key} must be of type {key_type}.")
     return value
 
 

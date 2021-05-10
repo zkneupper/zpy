@@ -117,7 +117,7 @@ def parse_mot_annotations(
     log.info(f"Verifying MOT annotations at {annotation_file}...")
     mot = zpy.files.read_csv(annotation_file)
     for row in mot:
-        if not len(row) == 9:
+        if len(row) != 9:
             raise MOTParseError(
                 f"Each row in MOT csv must have len 9, found len {len(row)}"
             )

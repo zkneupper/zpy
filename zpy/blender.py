@@ -42,15 +42,14 @@ def use_gpu(
     compute_devices = [d[0] for d in cycles_preferences.get_device_types(C)]
     if compute_device_type not in compute_devices:
         raise RuntimeError("Non-existing device type")
-    else:
-        cycles_preferences.compute_device_type = compute_device_type
-        devices = cycles_preferences.get_devices_for_type(compute_device_type)
-        if len(devices) > 0:
-            for c in devices:
-                c.use = True
-                if c.type == "CPU":
-                    c.use = use_cpu
-                log.info(f"Using devices {c} {c.type} {c.use}")
+    cycles_preferences.compute_device_type = compute_device_type
+    devices = cycles_preferences.get_devices_for_type(compute_device_type)
+    if len(devices) > 0:
+        for c in devices:
+            c.use = True
+            if c.type == "CPU":
+                c.use = use_cpu
+            log.info(f"Using devices {c} {c.type} {c.use}")
 
     C.scene.cycles.device = "GPU"
     log.info(f"Using gpu type:{compute_device_type} cpu:{use_cpu}")
@@ -100,12 +99,11 @@ def step(
     assert num_steps is not None, "Invalid num_steps"
     assert num_steps > 0, "Invalid num_steps"
     scene = zpy.blender.verify_blender_scene()
-    step_idx = 0
     if framerate > 0:
         start = scene.frame_start
         stop = scene.frame_end
         log.info(f"Animation enabled. Min frames: {start}. Max frames: {stop}")
-    while step_idx < num_steps:
+    for step_idx in range(num_steps):
         zpy.logging.linebreaker_log("step")
         log.info(f"Simulation step {step_idx + 1} of {num_steps}.")
         start_time = time.time()
@@ -114,7 +112,6 @@ def step(
             scene.frame_set(current_frame)
             log.info(f"Animation frame {scene.frame_current}")
         yield step_idx
-        step_idx += 1
         duration = time.time() - start_time
         log.info(f"Simulation step took {duration}s to complete.")
         # TODO: This call is not needed in headless instances, makes loop faster
@@ -404,10 +401,12 @@ def scene_information() -> Dict:
 
     run_kwargs = []
     for param in inspect.signature(run_function).parameters.values():
-        _kwarg = {}
-        _kwarg["name"] = param.name
-        _kwarg["type"] = str(param.annotation)
-        _kwarg["default"] = param.default
+        _kwarg = {
+            "name": param.name,
+            "type": str(param.annotation),
+            "default": param.default,
+        }
+
         run_kwargs.append(_kwarg)
 
     scene = zpy.blender.verify_blender_scene()
@@ -419,7 +418,8 @@ def scene_information() -> Dict:
         "export_date": time.strftime("%m%d%Y_%H%M_%S"),
         "zpy_version": zpy.__version__,
         "zpy_path": zpy.__file__,
-        "blender_version": ".".join([str(_) for _ in bpy.app.version]),
+        "blender_version": ".".join(str(_) for _ in bpy.app.version),
     }
+
     log.info(f"{_}")
     return _

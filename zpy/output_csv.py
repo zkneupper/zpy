@@ -83,6 +83,6 @@ def parse_csv_annotations(
     except StopIteration:
         raise CSVParseError(f"No data found in CSV at {annotation_file}")
     log.debug(f"Row length in CSV: {[length for l in csv_data_iterable]}")
-    if not all(len(l) == length for l in csv_data_iterable):
+    if any(len(l) != length for l in csv_data_iterable):
         raise CSVParseError(f"Not all rows in the CSV have same length {length}")
     # TODO: Return Saver object.

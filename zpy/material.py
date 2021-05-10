@@ -61,9 +61,8 @@ def for_mat_in_obj(
     else:
         if obj.active_material is not None:
             return obj.active_material
-        else:
-            log.debug(f"No active material or material slots found for {obj.name}")
-            return None
+        log.debug(f"No active material or material slots found for {obj.name}")
+        return None
 
 
 _SAVED_MATERIALS = {}
@@ -187,10 +186,12 @@ def random_texture_mat(
         texture_dir = zpy.blender.get_asset_lib_path().joinpath(texture_dir)
     texture_dir = zpy.files.verify_path(texture_dir, check_dir=True)
     # Create list of texture images in directory
-    texture_paths = []
-    for _path in texture_dir.iterdir():
-        if _path.is_file() and _path.suffix in [".jpg", ".png"]:
-            texture_paths.append(_path)
+    texture_paths = [
+        _path
+        for _path in texture_dir.iterdir()
+        if _path.is_file() and _path.suffix in [".jpg", ".png"]
+    ]
+
     texture_path = random.choice(texture_paths)
     log.info(f"Found {len(texture_paths)} Textures at {texture_dir}")
     log.info(f"Randomly picked {texture_path.stem}")
@@ -316,7 +317,7 @@ def make_aov_material_output_node(
     """
     # Make sure engine is set to Cycles
     scene = zpy.blender.verify_blender_scene()
-    if not (scene.render.engine == "CYCLES"):
+    if scene.render.engine != "CYCLES":
         log.warning(" Setting render engine to CYCLES to use AOV")
         scene.render.engine == "CYCLES"
 

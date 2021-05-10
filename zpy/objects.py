@@ -181,7 +181,7 @@ def for_obj_in_selected_objs(context) -> bpy.types.Object:
     zpy.blender.verify_view_layer()
     for obj in context.selected_objects:
         # Only meshes or empty objects TODO: Why the empty objects
-        if not (obj.type == "MESH" or obj.type == "EMPTY"):
+        if not obj.type in ["MESH", "EMPTY"]:
             continue
         # Make sure object exists in the scene
         if bpy.data.objects.get(obj.name, None) is None:
@@ -247,10 +247,12 @@ def randomly_hide_within_collection(
         collections (List[bpy.types.Collection]): A scene collection.
         chance_to_hide (float, optional): Probability of hiding an object in the collection. Defaults to 0.9.
     """
-    to_hide = []
-    for obj in for_obj_in_collections(collections):
-        if random.random() < chance_to_hide:
-            to_hide.append(obj.name)
+    to_hide = [
+        obj.name
+        for obj in for_obj_in_collections(collections)
+        if random.random() < chance_to_hide
+    ]
+
     # HACK: hide objects by name, this causes segfault
     # if done in the for loop above, due to some kind of
     # pass by reference vs by value shenaniganry going on
@@ -319,7 +321,7 @@ def populate_vertex_colors(
         seg_type (str, optional): Instance or Category segmentation. Defaults to 'instance'.
     """
     obj = verify(obj)
-    if not obj.type == "MESH":
+    if obj.type != "MESH":
         log.warning(f"Object {obj.name} is not a mesh, has no vertices.")
         return
     # TODO: Is this select needed?
@@ -425,10 +427,7 @@ def translate(
     log.debug(f"Before - obj.matrix_world\n{obj.matrix_world}")
     if not isinstance(translation, mathutils.Vector):
         translation = mathutils.Vector(translation)
-    if is_absolute:
-        obj.location = translation
-    else:
-        obj.location = obj.location + translation
+    obj.location = translation if is_absolute else obj.location + translation
     log.debug(f"After - obj.matrix_world\n{obj.matrix_world}")
 
 
@@ -488,7 +487,7 @@ def jitter_mesh(
         scale (Tuple[float], optional): Scale for vertex offset in each axis (x, y, z). Defaults to (0.01, 0.01, 0.01).
     """
     obj = verify(obj)
-    if not obj.type == "MESH":
+    if obj.type != "MESH":
         log.warning("Jitter mesh requires object to be of type MESH")
         return
     for vertex in obj.data.vertices:
