@@ -484,9 +484,7 @@ def unzip_file(
     if zip_path.suffix != ".zip":
         raise ValueError(f"{zip_path} is not a zip file")
     zf = zipfile.ZipFile(str(zip_path))
-    zipped_size_mb = round(
-        sum(i.compress_size for i in zf.infolist()) / 1024 / 1024
-    )
+    zipped_size_mb = round(sum(i.compress_size for i in zf.infolist()) / 1024 / 1024)
 
     unzipped_size_mb = round(sum(i.file_size for i in zf.infolist()) / 1024 / 1024)
     log.info(f"Compressed: {zipped_size_mb}MB, actual: {unzipped_size_mb}MB.")
@@ -517,9 +515,7 @@ def zip_file(
     )
     log.info(f"Done zipping to {zip_path}.")
     zf = zipfile.ZipFile(str(zip_path))
-    zipped_size_mb = round(
-        sum(i.compress_size for i in zf.infolist()) / 1024 / 1024
-    )
+    zipped_size_mb = round(sum(i.compress_size for i in zf.infolist()) / 1024 / 1024)
 
     unzipped_size_mb = round(sum(i.file_size for i in zf.infolist()) / 1024 / 1024)
     log.info(f"Compressed: {zipped_size_mb}MB, actual: {unzipped_size_mb}MB.")

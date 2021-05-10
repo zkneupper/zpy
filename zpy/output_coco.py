@@ -556,19 +556,13 @@ def parse_coco_annotations(
         keypoints = annotation.get("num_keypoints", None)
         if keypoints is not None:
             if "keypoints_xyv" in annotation and (
-                len(annotation["keypoints_xyv"])
-                != int(annotation["num_keypoints"]) * 3
+                len(annotation["keypoints_xyv"]) != int(annotation["num_keypoints"]) * 3
             ):
-                raise COCOParseError(
-                    "keypoints_xyv not correct size {len(keypoints)}"
-                )
+                raise COCOParseError("keypoints_xyv not correct size {len(keypoints)}")
             if "keypoints_xyz" in annotation and (
-                len(annotation["keypoints_xyz"])
-                != int(annotation["num_keypoints"]) * 3
+                len(annotation["keypoints_xyz"]) != int(annotation["num_keypoints"]) * 3
             ):
-                raise COCOParseError(
-                    "keypoints_xyz not correct size {len(keypoints)}"
-                )
+                raise COCOParseError("keypoints_xyz not correct size {len(keypoints)}")
 
         # Save each annotation to ImageSaver object
         if output_saver:
